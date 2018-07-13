@@ -15,7 +15,10 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 )
+
+const DefaultFileMode = 0600
 
 type templateRenderError error
 
@@ -96,6 +99,15 @@ func tarDirAsString(directoryPath string, vars map[string]interface{}) (string, 
 			return err
 		}
 
+		zeroTime := time.Unix(0, 0)
+		header.ChangeTime = zeroTime
+		header.AccessTime = zeroTime
+		header.ModTime = zeroTime
+		header.Uname = ""
+		header.Gname = ""
+		header.Uid = 0
+		header.Gid = 0
+
 		if f.IsDir() {
 			header.Name = relPath
 			if err := tw.WriteHeader(header); err != nil {
@@ -116,7 +128,7 @@ func tarDirAsString(directoryPath string, vars map[string]interface{}) (string, 
 
 			header := &tar.Header{
 				Name: relPath,
-				Mode: int64(f.Mode()),
+				Mode: DefaultFileMode,
 				Size: int64(len(outputContent)),
 			}
 

@@ -113,7 +113,7 @@ func TestTemplateDirRendering(t *testing.T) {
 				if _, err := os.Stat(out); os.IsNotExist(err) {
 					return nil
 				}
-				return errors.New("template_dir did not get destroyed")
+				return errors.New("tar_template did not get destroyed")
 			},
 		})
 	}
