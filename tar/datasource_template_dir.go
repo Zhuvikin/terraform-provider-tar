@@ -86,14 +86,17 @@ func tarDirAsString(directoryPath string, vars map[string]interface{}) (string, 
 		}
 
 		relPath, _ := filepath.Rel(directoryPath, p)
+		if relPath == "." {
+			return nil
+		}
+
+		var header *tar.Header
+		header, err = tar.FileInfoHeader(f, f.Name())
+		if err != nil {
+			return err
+		}
+
 		if f.IsDir() {
-			var header *tar.Header
-
-			header, err = tar.FileInfoHeader(f, f.Name())
-			if err != nil {
-				return err
-			}
-
 			header.Name = relPath
 			if err := tw.WriteHeader(header); err != nil {
 				return err
@@ -111,13 +114,13 @@ func tarDirAsString(directoryPath string, vars map[string]interface{}) (string, 
 				return templateRenderError(fmt.Errorf("failed to render %v: %v", p, err))
 			}
 
-			hdr := &tar.Header{
+			header := &tar.Header{
 				Name: relPath,
 				Mode: int64(f.Mode()),
 				Size: int64(len(outputContent)),
 			}
 
-			if err := tw.WriteHeader(hdr); err != nil {
+			if err := tw.WriteHeader(header); err != nil {
 				return err
 			}
 
