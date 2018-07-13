@@ -18,7 +18,7 @@ import (
 	"time"
 )
 
-const DefaultFileMode = 0600
+const DefaultFileMode = 0660
 
 type templateRenderError error
 
@@ -41,7 +41,7 @@ func dataSourceDir() *schema.Resource {
 				ValidateFunc: validateVarsAttribute,
 				ForceNew:     true,
 			},
-			"rendered": &schema.Schema{
+			"rendered": {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "rendered template",
@@ -107,6 +107,7 @@ func tarDirAsString(directoryPath string, vars map[string]interface{}) (string, 
 		header.Gname = ""
 		header.Uid = 0
 		header.Gid = 0
+		header.Mode = DefaultFileMode
 
 		if f.IsDir() {
 			header.Name = relPath
